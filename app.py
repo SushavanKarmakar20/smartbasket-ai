@@ -26,6 +26,8 @@ df = pd.read_csv("static/data/BigBasket.csv")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "Key Not Found")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 MODEL = "mistralai/mistral-7b-instruct"
+EMAIL_USER = os.getenv("EMAIL_USER")
+EMAIL_PASS = os.getenv("EMAIL_PASS")
 
 def get_ingredients_from_ai(recipe: str):
     headers = {
@@ -162,13 +164,11 @@ def payment():
 
     # --- Send Email (dummy config for now) ---
     try:
-        sender_email = "algorhythm.noreply@gmail.com"
         receiver_email = order["email"]
-        password = "qizi jrgq cfdf jyfp"  # for Gmail, generate App Password
 
         msg = MIMEMultipart("alternative")
         msg["Subject"] = "SmartBasket Order Confirmation"
-        msg["From"] = sender_email
+        msg["From"] = EMAIL_USER
         msg["To"] = receiver_email
 
         # Attach the rendered HTML
@@ -176,8 +176,8 @@ def payment():
 
         # Send via Gmail SMTP
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ssl.create_default_context()) as server:
-            server.login(sender_email, password)
-            server.sendmail(sender_email, receiver_email, msg.as_string())
+            server.login(EMAIL_USER, EMAIL_PASS)
+            server.sendmail(EMAIL_USER, receiver_email, msg.as_string())
     except Exception as e:
         print("❌ Email send failed:", e)
 
