@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Confirmation</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(45deg, rgba(16, 185, 129, 0.1), rgba(20, 184, 166, 0.1));
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background elements */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 165, 150, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 200, 180, 0.3) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0px, 0px) rotate(0deg); }
+      33% { transform: translate(30px, -30px) rotate(120deg); }
+      66% { transform: translate(-20px, 20px) rotate(240deg); }
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 25px;
+      box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+      background-size: 200% 100%;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    h2 {
+      color: #2e7d32;
+      text-align: center;
+      margin-bottom: 35px;
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, #2e7d32, #4caf50);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      animation: fadeInDown 1s ease-out;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, #2e7d32, #4caf50);
+      border-radius: 2px;
+    }
+
+    .details, .receipt {
+      margin-top: 30px;
+      padding: 30px;
+      border-radius: 20px;
+      background: linear-gradient(145deg, 
+        rgba(241, 248, 233, 0.8), 
+        rgba(232, 245, 233, 0.9));
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(76, 175, 80, 0.2);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .details:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .receipt {
+      animation-delay: 0.4s;
+    }
+
+    .details::before, .receipt::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        transparent);
+      transition: left 0.6s ease;
+    }
+
+    .details:hover::before, .receipt:hover::before {
+      left: 100%;
+    }
+
+    .details:hover, .receipt:hover {
+      transform: translateY(-5px);
+      box-shadow: 
+        0 15px 35px rgba(46, 125, 50, 0.15),
+        0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .details h3, .receipt h3 {
+      color: #1b5e20;
+      margin-bottom: 20px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(45deg, #1b5e20, #2e7d32);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .details p, .receipt p {
+      margin: 12px 0;
+      color: #2e7d32;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(76, 175, 80, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .details p:hover, .receipt p:hover {
+      background: rgba(76, 175, 80, 0.05);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+    }
+
+    .details p b, .receipt p b {
+      color: #1b5e20;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .receipt ul {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+    }
+
+    .receipt li {
+      padding: 15px 20px;
+      margin: 10px 0;
+      background: linear-gradient(145deg, 
+        rgba(255, 255, 255, 0.8), 
+        rgba(248, 250, 248, 0.9));
+      border: 1px solid rgba(76, 175, 80, 0.15);
+      border-radius: 12px;
+      color: #2e7d32;
+      font-size: 1rem;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .receipt li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: linear-gradient(180deg, #4caf50, #2e7d32);
+      transition: width 0.3s ease;
+    }
+
+    .receipt li:hover {
+      transform: translateX(5px);
+      box-shadow: 0 8px 25px rgba(46, 125, 50, 0.15);
+      background: linear-gradient(145deg, 
+        rgba(255, 255, 255, 0.95), 
+        rgba(240, 248, 240, 0.95));
+    }
+
+    .receipt li:hover::before {
+      width: 100%;
+      opacity: 0.1;
+    }
+
+    /* Enhanced styling for the total sections */
+    .receipt p:nth-last-child(2),
+    .receipt p:last-child {
+      background: linear-gradient(145deg, 
+        rgba(76, 175, 80, 0.1), 
+        rgba(46, 125, 50, 0.15));
+      padding: 15px 20px;
+      border-radius: 12px;
+      border: 2px solid rgba(46, 125, 50, 0.2);
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 15px 0;
+    }
+
+    .receipt p:last-child {
+      background: linear-gradient(145deg, 
+        rgba(46, 125, 50, 0.15), 
+        rgba(27, 94, 32, 0.2));
+      border-color: rgba(27, 94, 32, 0.3);
+    }
+
+    .download-section {
+      text-align: center;
+      margin-top: 40px;
+      animation: fadeInUp 1s ease-out 0.6s both;
+    }
+
+    .download-btn {
+      display: inline-block;
+      padding: 18px 36px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      background: linear-gradient(145deg, #2e7d32, #4caf50);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 
+        0 10px 30px rgba(46, 125, 50, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .download-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.3), 
+        transparent);
+      transition: left 0.6s ease;
+    }
+
+    .download-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 
+        0 15px 40px rgba(46, 125, 50, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.3);
+      background: linear-gradient(145deg, #1b5e20, #2e7d32);
+    }
+
+    .download-btn:hover::before {
+      left: 100%;
+    }
+
+    .download-btn:active {
+      transform: translateY(-1px) scale(1.02);
+    }
+
+    /* Animation keyframes */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Success checkmark animation */
+    .success-icon {
+      display: inline-block;
+      position: relative;
+      animation: bounceIn 1.5s ease-out;
+    }
+
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3) rotate(-120deg);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.1) rotate(-10deg);
+      }
+      70% {
+        transform: scale(0.9) rotate(5deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        margin: 20px auto;
+        padding: 25px;
+        border-radius: 20px;
+      }
+
+      h2 {
+        font-size: 2rem;
+        margin-bottom: 25px;
+      }
+
+      .details, .receipt {
+        padding: 20px;
+        margin-top: 20px;
+      }
+
+      .details p, .receipt p {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+
+      .receipt li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+        padding: 12px 15px;
+      }
+
+      .download-btn {
+        padding: 15px 30px;
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 1.8rem;
+      }
+
+      .details h3, .receipt h3 {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+    <div class="text-center mb-16 animate-fadeInUp">
+      <h1 class="text-6xl md:text-7xl font-bold bg-gradient-to-r from-emerald-600 via-teal-700 to-cyan-800 bg-clip-text text-transparent mb-4 tracking-tight">
+        SmartBasket
+      </h1>
+      <p class="text-xl md:text-2xl text-gray-600 font-light mb-2">Where recipes become groceries</p>
+      <div class="w-24 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto animate-pulse"></div>
+    </div>
+  <div class="container">
+
+    <!-- Customer Details -->
+    <div class="details">
+      <h3>👤 Customer Information</h3>
+      <p><b>Name:</b> <span>{{ order.name }}</span></p>
+      <p><b>Address:</b> <span>{{ order.address }}</span></p>
+      <p><b>Phone:</b> <span>{{ order.phone }}</span></p>
+      <p><b>Payment Mode:</b> <span>{{ order.payment }}</span></p>
+      {% if order.info %}
+      <p><b>Additional Info:</b> <span>{{ order.info }}</span></p>
+      {% endif %}
+    </div>
+
+    <!-- Receipt -->
+    <div class="receipt">
+      <h3>🧾 Order Receipt</h3>
+      <ul>
+        {% for item in order.cart %}
+          <li>
+            <span>{{ item.ProductName }} × {{ item.QuantitySelected }}</span>
+            <span><strong>₹{{ (item.Price * item.QuantitySelected)|round(2) }}</strong></span>
+          </li>
+        {% endfor %}
+      </ul>
+      <p><b>Total Items:</b> <span>{{ order.cart|length }}</span></p>
+      <p><b>Total Cost:</b> <span>₹{{ order.total|round(2) }}</span></p>
+    </div>
+
+    <!-- Download Receipt -->
+    <div class="download-section">
+      <a href="{{ url_for('download_receipt') }}" class="download-btn">⬇️ Download Receipt</a>
+    </div>
+  </div>
+
+  <footer class="mt-12 text-center text-gray-600 text-sm">
+      <hr class="my-4 border-t border-gray-300">
+      <p>© 2025 SmartBasket. All Rights Reserved.</p>
+      <a href="mailto:support@smartbasket.com" style="color:#2e7d32; text-decoration:none;">algorhythm.noreply@gmail.com</a> 
+    </footer>
+</body>
+</html>

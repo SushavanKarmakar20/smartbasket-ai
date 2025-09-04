@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Shopping Cart</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(45deg, rgba(16, 185, 129, 0.1), rgba(20, 184, 166, 0.1));
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-variant: small-caps;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 30px;
+    }
+
+    .cart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #ffffff, #f0f0f0);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.5s;
+    }
+
+    .card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .card:hover::before {
+      left: 100%;
+    }
+
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      transition: transform 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .card:hover img {
+      transform: scale(1.05);
+    }
+
+    .card h3 {
+      color: #2c3e50;
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .card p {
+      color: #555;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .card p b {
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    .card p del {
+      color: #999;
+      margin-left: 8px;
+    }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+      background: rgba(102, 126, 234, 0.1);
+      padding: 12px;
+      border-radius: 50px;
+      backdrop-filter: blur(10px);
+    }
+
+    .qty-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #667eea, #764ba2);
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .qty-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .qty-btn:active {
+      transform: scale(0.95);
+    }
+
+    .qty-controls span {
+      background: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      color: #2c3e50;
+      min-width: 40px;
+      text-align: center;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+      font-size: 1.1rem;
+    }
+
+    .cart-sidebar {
+      background: linear-gradient(145deg, #ffffff, #f8f9fa);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+      border: 1px solid rgba(102, 126, 234, 0.1);
+    }
+
+    .cart-sidebar h3 {
+      color: #2c3e50;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      text-align: center;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    #cart-summary {
+      list-style: none;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    #cart-summary::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #cart-summary::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 3px;
+    }
+
+    #cart-summary::-webkit-scrollbar-thumb {
+      background: linear-gradient(145deg, #667eea, #764ba2);
+      border-radius: 3px;
+    }
+
+    #cart-summary li {
+      background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      border-radius: 10px;
+      color: #495057;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    #cart-summary li:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    hr {
+      border: none;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #667eea, transparent);
+      margin: 20px 0;
+    }
+
+    .cart-sidebar p {
+      font-size: 1.1rem;
+      color: #2c3e50;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cart-sidebar p b {
+      color: #495057;
+    }
+
+    .cart-sidebar p span {
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .proceed-btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(145deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 15px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .proceed-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .proceed-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    .proceed-btn:hover::before {
+      left: 100%;
+    }
+
+    .proceed-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .proceed-btn:disabled {
+      background: linear-gradient(145deg, #ccc, #bbb);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .proceed-btn:disabled::before {
+      display: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      
+      .cart-sidebar {
+        order: -1;
+        position: static;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px;
+        margin: 10px;
+        border-radius: 15px;
+      }
+      
+      h2 {
+        font-size: 12px;
+        margin-bottom: 20px;
+      }
+      
+      .cart-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .layout {
+        gap: 20px;
+      }
+    }
+
+    /* Loading animation */
+    .loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .loading .card {
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.8;
+      }
+    }
+
+    /* Success animation */
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+      70% {
+        transform: scale(0.9);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .success-animation {
+      animation: bounceIn 0.6s ease-out;
+    }
+  </style>
+</head>
+<body>
+    <div class="text-center mb-16 animate-fadeInUp">
+      <h1 class="text-6xl md:text-7xl font-bold bg-gradient-to-r from-emerald-600 via-teal-700 to-cyan-800 bg-clip-text text-transparent mb-4 tracking-tight">
+        SmartBasket
+      </h1>
+      <p class="text-xl md:text-2xl text-gray-600 font-light mb-2">Where recipes become groceries</p>
+      <div class="w-24 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto animate-pulse"></div>
+      
+    </div>
+    
+    <div class="container">
+        <h2 class="text-xl md:text-2xl text-gray-600 font-light mb-2">🛒 Suggested Ingredients By AI Agent</h2><br>
+        <div class="layout">
+        <!-- Product Grid -->
+        <div class="cart-grid">
+            {% for item in cart %}
+            <div class="card">
+            <img src="{{ item['Image_Url'] }}" alt="{{ item['ProductName'] }}">
+            <h3>{{ item['ProductName'] }}</h3>
+            <p><b>Brand:</b> {{ item['Brand'] }}</p>
+            <p><b>Price:</b> ₹{{ item['Price'] }} <del>₹{{ item['DiscountPrice'] }}</del></p>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="updateCart('{{ item['ProductName'] }}', 'remove', {{ loop.index0 }})">-</button>
+                <span id="qty-{{ loop.index0 }}">0</span>
+                <button class="qty-btn" onclick="updateCart('{{ item['ProductName'] }}', 'add', {{ loop.index0 }})">+</button>
+            </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="cart-sidebar">
+            <h3>🛍️ Smart Cart</h3>
+            <ul id="cart-summary"></ul>
+            <hr>
+            <p><b>Total Items:</b> <span id="total-items">0</span></p>
+            <p><b>Total Cost:</b> ₹<span id="total-cost">0.00</span></p>
+
+            <!-- Proceed to Buy -->
+            <form id="proceed-form" action="{{ url_for('checkout') }}" method="get">
+            <button id="proceed-btn" class="proceed-btn" disabled>Proceed to Buy</button>
+            </form>
+        </div>
+        </div>
+    </div>
+
+    <footer class="mt-12 text-center text-gray-600 text-sm">
+      <hr class="my-4 border-t border-gray-300">
+      <p>© 2025 SmartBasket. All Rights Reserved.</p>
+      <a href="mailto:support@smartbasket.com" style="color:#2e7d32; text-decoration:none;">algorhythm.noreply@gmail.com</a> 
+    </footer>
+
+  <script>
+    function updateCart(product, action, index) {
+      // Add loading state
+      $('.cart-grid').addClass('loading');
+      
+      $.ajax({
+        url: "/update_cart",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ product: product, action: action }),
+        success: function(data) {
+          // Update per-card quantity with animation
+          let qtyMap = data.quantities;
+          if (qtyMap[product] !== undefined) {
+            $("#qty-" + index).addClass('success-animation').text(qtyMap[product]);
+            setTimeout(() => {
+              $("#qty-" + index).removeClass('success-animation');
+            }, 600);
+          }
+
+          // Update sidebar
+          let list = $("#cart-summary");
+          list.empty();
+          data.items.forEach(item => {
+            list.append(`<li>${item.ProductName} x ${item.Qty} – ₹${(item.Price * item.Qty).toFixed(2)}</li>`);
+          });
+
+          $("#total-items").text(data.total_items);
+          $("#total-cost").text(data.total_cost.toFixed(2));
+
+          // Enable/disable proceed button with animation
+          if (data.total_items > 0) {
+            $("#proceed-btn").prop("disabled", false);
+          } else {
+            $("#proceed-btn").prop("disabled", true);
+          }
+        },
+        complete: function() {
+          // Remove loading state
+          $('.cart-grid').removeClass('loading');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
