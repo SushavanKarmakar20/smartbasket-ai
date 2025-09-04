@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="Icon" href="{{ url_for('static', filename='data/logo.png') }}" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <title>SmartBasket</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Enhanced Animations & Styles -->
+  <style>
+    /* Floating background shapes */
+    .floating-shapes {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .shape {
+      position: absolute;
+      background: linear-gradient(45deg, rgba(16, 185, 129, 0.1), rgba(20, 184, 166, 0.1));
+      border-radius: 50%;
+      animation: float 20s infinite linear;
+    }
+
+    .shape-1 {
+      width: 80px;
+      height: 80px;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .shape-2 {
+      width: 120px;
+      height: 120px;
+      left: 20%;
+      animation-delay: -5s;
+    }
+
+    .shape-3 {
+      width: 60px;
+      height: 60px;
+      left: 60%;
+      animation-delay: -10s;
+    }
+
+    .shape-4 {
+      width: 100px;
+      height: 100px;
+      left: 80%;
+      animation-delay: -15s;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Enhanced animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .animate-fadeInUp {
+      animation: fadeInUp 1s ease forwards;
+    }
+
+    .animate-slideUp {
+      animation: slideUp 0.8s ease forwards;
+    }
+
+    .animate-fadeIn {
+      animation: fadeIn 1s ease forwards;
+    }
+
+    .animation-delay-500 {
+      animation-delay: 0.5s;
+      animation-fill-mode: both;
+    }
+
+    .animation-delay-700 {
+      animation-delay: 0.7s;
+      animation-fill-mode: both;
+    }
+
+    .animation-delay-1000 {
+      animation-delay: 1s;
+      animation-fill-mode: both;
+    }
+
+    /* Suggestion pills */
+    .suggestion-pill {
+      padding: 8px 16px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 20px;
+      font-size: 14px;
+      color: #4b5563;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .suggestion-pill:hover {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #059669;
+      transform: translateY(-2px);
+    }
+
+    /* Feature cards */
+    .feature-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      background: rgba(255, 255, 255, 0.9);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(to bottom, #10b981, #14b8a6);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(to bottom, #059669, #0d9488);
+    }
+  </style>
+</head>
+<body class="min-h-screen overflow-x-hidden" style="font-family: 'Inter', sans-serif;">
+  
+  <!-- Animated Background -->
+  <div class="fixed inset-0 -z-10">
+    <div class="absolute inset-0 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100"></div>
+    <div class="floating-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+      <div class="shape shape-4"></div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+    
+    <!-- Header Section -->
+    <div class="text-center mb-16 animate-fadeInUp">
+      <div class="inline-block p-4 mb-6 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-500">
+        <img src="{{ url_for('static', filename='data/logo.png') }}" alt="logo" width="120" height="75">
+      </div>
+      <h1 class="text-6xl md:text-7xl font-bold bg-gradient-to-r from-emerald-600 via-teal-700 to-cyan-800 bg-clip-text text-transparent mb-4 tracking-tight">
+        SmartBasket
+      </h1>
+      <p class="text-xl md:text-2xl text-gray-600 font-light mb-2">Where recipes become groceries</p>
+      <div class="w-24 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto animate-pulse"></div>
+    </div>
+
+    <!-- Enhanced Search Box -->
+    <div class="w-full max-w-3xl mb-8 animate-slideUp">
+      <div class="relative group">
+        <!-- Glow effect -->
+        <div class="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+        
+        <form method="POST" class="relative bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/50 overflow-hidden">
+          <div class="flex items-center">
+            
+            <!-- Search Icon -->
+            <div class="pl-6 pr-2 py-6 text-gray-400">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+
+            <!-- Enhanced Input -->
+            <input 
+              type="text" 
+              name="recipe" 
+              placeholder="What delicious recipe are you craving? (e.g., Paneer Butter Masala, Chicken Tikka)" 
+              required
+              class="flex-1 py-6 pr-4 text-lg text-gray-800 placeholder-gray-500 bg-transparent focus:outline-none focus:placeholder-gray-400 transition-all duration-300"
+            >
+
+            <!-- Enhanced Button -->
+            <button 
+              type="submit" 
+              class="m-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl group"
+            >
+              <div class="flex items-center space-x-2">
+                <span>Get Ingredients</span>
+                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+              </div>
+            </button>
+          </div>
+
+          <!-- Input focus line -->
+          <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 transform scale-x-0 transition-transform duration-300 focus-within:scale-x-100"></div>
+        </form>
+      </div>
+      <br>
+
+      <!-- Quick suggestions -->
+      <div class="mt-6 animate-fadeIn animation-delay-500">
+        <p class="text-sm text-gray-500 text-center mb-3">Try these popular recipes:</p>
+        <div class="flex flex-wrap justify-center gap-2">
+          <button class="suggestion-pill">🍛 Biryani</button>
+          <button class="suggestion-pill">🍕 Margherita Pizza</button>
+          <button class="suggestion-pill">🍜 Fried Rice<n>
+          <button class="suggestion-pill">🥘 Butter Chicken</button>
+          <button class="suggestion-pill">🍰 Chocolate Cake</button>
+        </div>
+      </div>
+    </div>
+
+  <!-- Interactive JavaScript -->
+  <script>
+    // Add interactive functionality to suggestion pills
+    document.querySelectorAll('.suggestion-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const input = document.querySelector('input[name="recipe"]');
+        input.value = pill.textContent.replace(/^🍛|🍕|🍜|🥘|🍰\s/, '');
+        input.focus();
+        
+        // Add a subtle animation
+        pill.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          pill.style.transform = '';
+        }, 150);
+      });
+    });
+
+    // Add form submission feedback
+    document.querySelector('form').addEventListener('submit', (e) => {
+      const button = e.target.querySelector('button[type="submit"]');
+      const originalText = button.innerHTML;
+      
+      button.innerHTML = `
+        <div class="flex items-center space-x-2">
+          <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          <span>Searching...</span>
+        </div>
+      `;
+      
+      // Reset after a delay (remove this in production)
+      setTimeout(() => {
+        button.innerHTML = originalText;
+      }, 2000);
+    });
+
+    // Add subtle parallax effect to shapes
+    document.addEventListener('mousemove', (e) => {
+      const shapes = document.querySelectorAll('.shape');
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      
+      shapes.forEach((shape, index) => {
+        const speed = (index + 1) * 0.5;
+        const moveX = (x - 0.5) * speed;
+        const moveY = (y - 0.5) * speed;
+        
+        shape.style.transform += ` translate(${moveX}px, ${moveY}px)`;
+      });
+    });
+  </script>
+
+</body>
+</html>

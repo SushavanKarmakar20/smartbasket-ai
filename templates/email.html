@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Order Confirmation</title>
+</head>
+<body style="margin:0; padding:0; font-family: Arial, sans-serif; background:#f6f9fc;">
+
+  <!-- Header -->
+  <div style="text-align:center; padding:20px; background:#2e7d32; color:#ffffff;">
+    <h1 style="margin:0; font-size:28px;">SmartBasket</h1>
+    <p style="margin:5px 0 0; font-size:16px;">Where recipes become groceries</p>
+  </div>
+
+  <!-- Main Container -->
+  <div style="max-width:650px; margin:20px auto; background:#ffffff; padding:20px; border-radius:8px; border:1px solid #e0e0e0;">
+
+    <!-- Customer Details -->
+    <div style="margin-bottom:20px; padding:15px; background:#f9fdf9; border:1px solid #d6e9c6; border-radius:6px;">
+      <h3 style="margin-top:0; color:#1b5e20;">Customer Information</h3>
+      <p><b>Name:</b> {{ order.name }}</p>
+      <p><b>Email:</b> {{ order.email }}</p>
+      <p><b>Address:</b> {{ order.address }}</p>
+      <p><b>Phone:</b> {{ order.phone }}</p>
+      <p><b>Payment Mode:</b> {{ order.payment }}</p>
+      {% if order.info %}
+      <p><b>Additional Info:</b> {{ order.info }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Order Receipt -->
+    <div style="padding:15px; background:#f9fdf9; border:1px solid #d6e9c6; border-radius:6px;">
+      <h3 style="margin-top:0; color:#1b5e20;">Order Receipt</h3>
+      <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:14px;">
+        <tbody>
+          {% for item in order.cart %}
+          <tr style="border-bottom:1px solid #ddd;">
+            <td>{{ item.ProductName }} × {{ item.QuantitySelected }}</td>
+            <td align="right">₹{{ (item.Price * item.QuantitySelected)|round(2) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div style="margin-top:15px; padding:10px; background:#e8f5e9; border-radius:4px; font-weight:bold;">
+        Total Items: {{ order.cart|length }} <br>
+        Total Cost: ₹{{ order.total|round(2) }}
+      </div>
+    </div>
+
+    <!-- Thank You Note -->
+    <p style="margin-top:20px; font-size:13px; color:#555; text-align:center;">
+      Thank you for your order! We will notify you once it is shipped. 🚚
+    </p>
+
+    <!-- Footer -->
+    <div style="margin-top:30px; padding:15px; background:#f1f1f1; text-align:center; font-size:12px; color:#666; border-top:1px solid #ddd;">
+      <p style="margin:5px 0;">© 2025 SmartBasket. All rights reserved.</p>
+      <p style="margin:5px 0;">For any issues, contact us at 
+        <a href="mailto:support@smartbasket.com" style="color:#2e7d32; text-decoration:none;">algorhythm.noreply@gmail.com</a> 
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>
